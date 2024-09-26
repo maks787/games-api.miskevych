@@ -1,4 +1,5 @@
 const express = require('express')
+const res = require('express/lib/response')
 const app= express()
 const port = 8080
 const swaggerUi = require('swagger-ui-express')
@@ -30,15 +31,28 @@ app.get('/games/:id', (req,res) => {
     res.send(games[req.params.id -1])
 })
 app.post('/games', (req,res) => {
-    games.push({
+    if (!req.body.name || !req.body.price){
+        return res.status(400).send({error: 'One or all params are missing'})
+    }
+    let game = {
+
         id: games.length + 1,
         price: req.body.price,
         name: req.body.name
+    }
+    games.push(game)
+    res.status(201)
+        .location(`${getBaseUrl(req)}/games/${games.lenght}`)
+        .send(game)
     })
-    res.end()
-})
+    
+
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
 
 app.listen(port, () => {
     console.log(`API up at: http://localhost:${port}`)
 })
+function getBaseUrl(req){
+    return req.connection && req.connection.encrypted
+    ? 'https': 'http' + `://${req.headers.host}`
+}

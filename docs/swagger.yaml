@@ -1,94 +1,125 @@
 openapi: 3.0.2
 info:
-    title: New API
-    version: 1.0.0
-    description: '###This is swagger UI for our games API'
+  title: New API
+  version: 1.0.0
+  description: '### This is swagger UI for our games API'
 paths:
-    /games:
-        get:
-            tags:
-                - games
-            responses:
-                '200':
-                    content:
-                        application/json:
-                            schema:
-                                type: array
-                                items:
-                                    type: string
-                            examples:
-                                List of games:
-                                    value: |-
-                                        [
-                                            "Witcher 3"
-                                            "Cyberpunk 2077"
-                                            "Dota 2"
-                                        ]
-            description: Returns a list of all games in API
-        post:
-            tags:
-                - post
-            responses:
-                '200':
-                    content:
-                        application/json:
-                            schema:
-                                type: array
-                                items:
-                                    type: string
-                            examples:
-                                game:
-                                    value: |4
-                                            {id:1, name: "Witcher 3", price: 29.99},
-                                            {id:2, name: "Cyberpunk", price: 39.99},
-                                            {id:3, name: "Dota 2", price: 0},
-                                            {id:4, name: "Minecraft", price: 19.99},
-                                            {id:5, name: "CS:GO", price: 0},
-                                            {id:6, name: "Roblox", price: 10},
-                                            {id:7, name: "GTA V", price: 49.99},
-                                            {id:8, name: "DEADLOCK", price: 0},
-                    description: add
-            summary: add a game
-            description: Returns of a list game
-    '/games/{id}':
-        get:
-            tags:
-                - details
-            responses:
-                '200':
-                    content:
-                        application/json:
-                            schema:
-                                type: array
-                                items:
-                                    type: string
-                            examples:
-                                Full details of a game:
-                                    value: |4-
-                                            {id:1, name: "Witcher 3", price: 29.99},
-                                            {id:2, name: "Cyberpunk", price: 39.99},
-                                            {id:3, name: "Dota 2", price: 0},
-                                            {id:4, name: "Minecraft", price: 19.99},
-                                            {id:5, name: "CS:GO", price: 0},
-                                            {id:6, name: "Roblox", price: 10},
-                                            {id:7, name: "GTA V", price: 49.99},
-                                            {id:8, name: "DEADLOCK", price: 0},
-                    description: info
-                '404':
-                    content:
-                        application/json: {}
-                    description: Not found game
-            operationId: id
-            summary: Get full details of a game
-            description: Returns full details of a given id game
+  /games:
+    get:
+      tags:
+        - games
+      responses:
+        '200':
+          description: Returns a list of all games in API
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              examples:
+                List of games:
+                  value: |
+                    [
+                      "Witcher 3",
+                      "Cyberpunk 2077",
+                      "Dota 2"
+                    ]
+    post:
+      tags:
+        - games
+      summary: Add a game
+      description: Adds a new game to the list
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: The name of the game
+                  example: "Witcher 3"
+                price:
+                  type: number
+                  format: float
+                  description: The price of the game
+                  example: 29.99
+            required:
+              - name
+              - price
+      responses:
+        '201':
+          description: Game added successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Game'
+              example:
+                id: 9
+                name: "New Game"
+                price: 29.99
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error: "Invalid game data"
+  '/games/{id}':
+    get:
+      tags:
+        - details
+      summary: Get full details of a game
+      description: Returns full details of a given game by ID
+      operationId: getGameById
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID of the game to retrieve
+      responses:
+        '200':
+          description: Game found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Game'
+              examples:
+                Game details:
+                  value: |
+                    {id:1, name: "Witcher 3", price: 29.99}
+        '404':
+          description: Game not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error: "Game not found"
 components:
-    schemas:
+  schemas:
+    Game:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the game
+        name:
+          type: string
+          description: Name of the game
+        price:
+          type: number
+          format: float
+          description: Price of the game
+    error:
+      type: object
+      properties:
         error:
-            title: Root Type for error
-            description: Game not found
-            type: object
-            properties:
-                error:
-                    type: string
-            example:
-                error: Error Message.
+          type: string
+      example:
+        error: "Game not found"
