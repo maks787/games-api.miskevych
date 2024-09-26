@@ -16,14 +16,14 @@ paths:
               schema:
                 type: array
                 items:
-                  type: string
+                  $ref: '#/components/schemas/Game'
               examples:
                 List of games:
                   value: |
                     [
-                      "Witcher 3",
-                      "Cyberpunk 2077",
-                      "Dota 2"
+                      {id: 1, name: "Witcher 3", price: 29.99},
+                      {id: 2, name: "Cyberpunk 2077", price: 39.99},
+                      {id: 3, name: "Dota 2", price: 0}
                     ]
     post:
       tags:
@@ -92,7 +92,31 @@ paths:
               examples:
                 Game details:
                   value: |
-                    {id:1, name: "Witcher 3", price: 29.99}
+                    {id: 1, name: "Witcher 3", price: 29.99}
+        '404':
+          description: Game not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error: "Game not found"
+    delete:
+      tags:
+        - games
+      summary: Delete a game
+      description: Deletes a game by its ID
+      operationId: deleteGameById
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID of the game to delete
+      responses:
+        '204':
+          description: Game deleted successfully, no content to return
         '404':
           description: Game not found
           content:
