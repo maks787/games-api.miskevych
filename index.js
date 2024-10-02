@@ -32,6 +32,22 @@ app.get('/games/:id', (req, res) => {
     res.send(game);
 });
 
+// Исправленный метод DELETE
+app.delete('/games/:id', (req, res) => {
+    const gameIndex = games.findIndex(g => g.id === parseInt(req.params.id));
+
+    // Проверка, существует ли игра с указанным ID
+    if (gameIndex === -1) {
+        return res.status(404).send({error: "Game not found"});
+    }
+
+    // Удаление игры
+    games.splice(gameIndex, 1);
+
+    // Успешный ответ
+    res.status(204).send();
+});
+
 app.post('/games', (req, res) => {
     if (!req.body.name || !req.body.price) {
         return res.status(400).send({error: 'One or all params are missing'});
